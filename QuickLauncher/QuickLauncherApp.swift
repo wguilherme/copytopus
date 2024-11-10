@@ -181,6 +181,15 @@ struct SearchView: View {
                     }
                     return .ignored
                 }
+                .onKeyPress { press in
+                    if press.key == .escape {
+                        DispatchQueue.main.async {
+                            appDelegate.closePopover()
+                        }
+                        return .handled
+                    }
+                    return .ignored
+                }
                 .onSubmit {
                     handleEnter()
                 }
