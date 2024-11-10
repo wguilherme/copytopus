@@ -126,6 +126,7 @@ struct SearchView: View {
      var body: some View {
         VStack(spacing: 0) {
             TextField("Search...", text: $searchText)
+                .allowsHitTesting(false) 
                 .textFieldStyle(.plain)
                 .focused($isFocused)
                 .onAppear {
@@ -187,7 +188,6 @@ struct SearchView: View {
                 .background(.ultraThinMaterial)
                 .cornerRadius(8)
             
-            // Search Results List
             if !filteredItems.isEmpty {
                 SearchListView(
                     items: filteredItems,
