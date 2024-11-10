@@ -38,28 +38,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         }
     }
     
-    private func setupPopover() {
-        let contentView = SearchView(appDelegate: self)
-        let hostingView = NSHostingView(rootView: contentView)
-        
-        popover = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 44),
-            styleMask: [.borderless, .titled],
-            backing: .buffered,
-            defer: false
-        )
-        
-        windowDelegate = WindowDelegate(appDelegate: self)
-        popover?.delegate = windowDelegate
-        
-        popover?.contentView = hostingView
-        popover?.backgroundColor = .clear
-        popover?.isOpaque = false
-        popover?.hasShadow = true
-        popover?.level = .floating
-        popover?.animationBehavior = .utilityWindow
-        popover?.isMovableByWindowBackground = true
-    }
+
+private func setupPopover() {
+    let contentView = SearchView(appDelegate: self)
+    let hostingView = NSHostingView(rootView: contentView)
+    
+    popover = CustomWindow(
+        contentRect: NSRect(x: 0, y: 0, width: 400, height: 44),
+        styleMask: [.borderless, .nonactivatingPanel],
+        backing: .buffered,
+        defer: false
+    )
+    
+    windowDelegate = WindowDelegate(appDelegate: self)
+    popover?.delegate = windowDelegate
+    
+    popover?.contentView = hostingView
+    popover?.backgroundColor = .clear
+    popover?.isOpaque = false
+    popover?.hasShadow = true
+    popover?.level = .floating
+    popover?.animationBehavior = .utilityWindow
+    popover?.isMovableByWindowBackground = true
+}
     
     private func togglePopover() {
         if popover?.isVisible == true {
@@ -220,5 +221,16 @@ struct SearchView: View {
         NSPasteboard.general.setString(selectedItem.title, forType: .string)
         print("Copiado para área de transferência: \(selectedItem.title)")
         appDelegate.closePopover()
+    }
+}
+
+
+class CustomWindow: NSWindow {
+    override var canBecomeKey: Bool {
+        return true
+    }
+    
+    override var canBecomeMain: Bool {
+        return true
     }
 }
