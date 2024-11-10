@@ -2,11 +2,15 @@ import SwiftUI
 
 struct SearchListView: View {
     let items: [SearchItem]
+    let selectedIndex: Int?
     
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(items) { item in
-                SearchItemRow(item: item)
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                SearchItemRow(
+                    item: item,
+                    isSelected: index == selectedIndex
+                )
                 
                 if item.id != items.last?.id {
                     Divider()
@@ -21,6 +25,7 @@ struct SearchListView: View {
 
 struct SearchItemRow: View {
     let item: SearchItem
+    let isSelected: Bool
     
     var body: some View {
         HStack(spacing: 12) {
@@ -41,11 +46,12 @@ struct SearchItemRow: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 10)
+        .background(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
         .contentShape(Rectangle())
         .highPriorityGesture(TapGesture().onEnded {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(item.title, forType: .string)
-            print("Clicou em: \(item.title)")
+            print("Copiado para área de transferência: \(item.title)")
         })
     }
 }

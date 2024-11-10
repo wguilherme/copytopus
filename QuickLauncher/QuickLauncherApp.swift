@@ -107,6 +107,7 @@ class WindowDelegate: NSObject, NSWindowDelegate {
 
 struct SearchView: View {
     @State private var searchText = ""
+    @State private var selectedIndex: Int? = nil  // Adicione esta linha
     @FocusState private var isFocused: Bool
     @ObservedObject var appDelegate: AppDelegate
     
@@ -120,7 +121,7 @@ struct SearchView: View {
         }
     }
     
-    var body: some View {
+     var body: some View {
         VStack(spacing: 0) {
             TextField("Search...", text: $searchText)
                 .textFieldStyle(.plain)
@@ -128,6 +129,7 @@ struct SearchView: View {
                 .onAppear {
                     isFocused = true
                     searchText = ""
+                    selectedIndex = nil  // Resetar seleção
                 }
                 .onChange(of: appDelegate.isWindowOpen) { newValue in
                     if newValue {
@@ -136,7 +138,27 @@ struct SearchView: View {
                         }
                     } else {
                         searchText = ""
+                        selectedIndex = nil  // Resetar seleção
                     }
+                }
+                .onKeyPress(.upArrow) { 
+                    if let current = selectedIndex {
+                        selectedIndex = max(0, current - 1)
+                    } else if !filteredItems.isEmpty {
+                        selectedIndex = filteredItems.count - 1
+                    }
+                    return .handled
+                }
+                .onKeyPress(.downArrow) {
+                    if let current = selectedIndex {
+                        selectedIndex = min(filteredItems.count - 1, current + 1)
+                    } else if !filteredItems.isEmpty {
+                        selectedIndex = 0
+                    }
+                    return .handled
+                }
+                .onSubmit {
+                    handleEnter()
                 }
                 .padding(10)
                 .background(.ultraThinMaterial)
@@ -144,8 +166,11 @@ struct SearchView: View {
             
             // Search Results List
             if !filteredItems.isEmpty {
-                SearchListView(items: filteredItems)
-                    .padding(.top, 4)
+                SearchListView(
+                    items: filteredItems,
+                    selectedIndex: selectedIndex
+                )
+                .padding(.top, 4)
             }
         }
         .padding(10)
@@ -162,5 +187,16 @@ struct SearchView: View {
                     }
                 }
         )
+    }
+
+        private func handleEnter() {
+        guard let selectedIndex = selectedIndex,
+              selectedIndex < filteredItems.count else { return }
+        
+        let selectedItem = filteredItems[selectedIndex]
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(selectedItem.title, forType: .string)
+        print("Copiado para área de transferência: \(selectedItem.title)")
+        appDelegate.closePopover()
     }
 }
