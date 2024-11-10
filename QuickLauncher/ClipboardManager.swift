@@ -5,7 +5,7 @@ class ClipboardManager: ObservableObject {
     @Published var clipboardHistory: [SearchItem] = []
     private var lastChangeCount: Int
     private var timer: Timer?
-    private let maxItems = 100  // Limite máximo de itens no histórico
+    private let maxItems = 100
     
     init() {
         self.lastChangeCount = NSPasteboard.general.changeCount
@@ -27,31 +27,36 @@ class ClipboardManager: ObservableObject {
         
         guard let newString = NSPasteboard.general.string(forType: .string) else { return }
         
-        // Evita duplicatas consecutivas
-        if let lastItem = clipboardHistory.first, lastItem.title == newString {
-            return
-        }
-        
         let timestamp = Date()
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .short
         dateFormatter.timeStyle = .short
         
         DispatchQueue.main.async {
-            let newItem = SearchItem(
-                title: newString,
-                subtitle: "Copiado em \(dateFormatter.string(from: timestamp))",
-                icon: "doc.on.clipboard"
-            )
-            
-            self.clipboardHistory.insert(newItem, at: 0)
-            
-            // Mantém apenas os últimos maxItems itens
-            if self.clipboardHistory.count > self.maxItems {
-                self.clipboardHistory.removeLast()
+            // Se encontrar um item existente, remove ele da posição atual
+            if let existingIndex = self.clipboardHistory.firstIndex(where: { $0.title == newString }) {
+                let existingItem = self.clipboardHistory.remove(at: existingIndex)
+                // Atualiza o timestamp do item existente
+                let updatedItem = SearchItem(
+                    title: existingItem.title,
+                    subtitle: "Copiado em \(dateFormatter.string(from: timestamp))",
+                    icon: existingItem.icon
+                )
+                self.clipboardHistory.insert(updatedItem, at: 0)
+            } else {
+                // Se não existir, cria um novo item
+                let newItem = SearchItem(
+                    title: newString,
+                    subtitle: "Copiado em \(dateFormatter.string(from: timestamp))",
+                    icon: "doc.on.clipboard"
+                )
+                self.clipboardHistory.insert(newItem, at: 0)
+                
+                if self.clipboardHistory.count > self.maxItems {
+                    self.clipboardHistory.removeLast()
+                }
             }
             
-            // Salva o histórico
             self.saveHistory()
         }
     }
