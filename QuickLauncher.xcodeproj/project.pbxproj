@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CDED4E012CE10A5E00BAC6DC /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = CDED4E002CE10A5E00BAC6DC /* HotKey */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CDED4DE32CE1099C00BAC6DC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDED4E012CE10A5E00BAC6DC /* HotKey in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = QuickLauncher;
 			packageProductDependencies = (
+				CDED4E002CE10A5E00BAC6DC /* HotKey */,
 			);
 			productName = QuickLauncher;
 			productReference = CDED4DD12CE1099B00BAC6DC /* QuickLauncher.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = CDED4DC82CE1099B00BAC6DC;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CDED4DFF2CE10A4700BAC6DC /* XCRemoteSwiftPackageReference "HotKey" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CDED4DD22CE1099B00BAC6DC /* Products */;
 			projectDirPath = "";
@@ -541,6 +550,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CDED4DFF2CE10A4700BAC6DC /* XCRemoteSwiftPackageReference "HotKey" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/soffes/HotKey";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CDED4E002CE10A5E00BAC6DC /* HotKey */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CDED4DFF2CE10A4700BAC6DC /* XCRemoteSwiftPackageReference "HotKey" */;
+			productName = HotKey;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CDED4DC92CE1099B00BAC6DC /* Project object */;
 }
