@@ -46,10 +46,10 @@ struct SearchItemRow: View {
                 .foregroundColor(.secondary)
             
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.title)
+                Text(item.title.truncated(limit: 50))  // Limita a 50 caracteres
                     .fontWeight(.medium)
                 
-                Text(item.subtitle)
+                Text(item.subtitle.truncated(limit: 60))  // Limita a 60 caracteres
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -65,5 +65,14 @@ struct SearchItemRow: View {
             NSPasteboard.general.setString(item.title, forType: .string)
             print("Copiado para área de transferência: \(item.title)")
         })
+    }
+}
+
+extension String {
+    func truncated(limit: Int) -> String {
+        if self.count <= limit {
+            return self
+        }
+        return String(self.prefix(limit)) + "..."
     }
 }
