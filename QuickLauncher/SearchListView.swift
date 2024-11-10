@@ -43,6 +43,8 @@ struct SearchItemRow: View {
         .padding(.horizontal, 10)
         .contentShape(Rectangle())
         .highPriorityGesture(TapGesture().onEnded {
+            NSPasteboard.general.clearContents()
+            NSPasteboard.general.setString(item.title, forType: .string)
             print("Clicou em: \(item.title)")
         })
     }
