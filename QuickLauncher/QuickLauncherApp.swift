@@ -106,16 +106,17 @@ class WindowDelegate: NSObject, NSWindowDelegate {
 }
 
 struct SearchView: View {
+    @StateObject private var clipboardManager = ClipboardManager()
     @State private var searchText = ""
-    @State private var selectedIndex: Int? = nil  // Adicione esta linha
+    @State private var selectedIndex: Int? = nil 
     @FocusState private var isFocused: Bool
     @ObservedObject var appDelegate: AppDelegate
     
     private var filteredItems: [SearchItem] {
         if searchText.isEmpty {
-            return []
+            return clipboardManager.clipboardHistory
         }
-        return SearchItem.mockItems.filter {
+        return clipboardManager.clipboardHistory.filter {
             $0.title.localizedCaseInsensitiveContains(searchText) ||
             $0.subtitle.localizedCaseInsensitiveContains(searchText)
         }
