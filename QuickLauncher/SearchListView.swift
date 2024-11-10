@@ -5,19 +5,32 @@ struct SearchListView: View {
     let selectedIndex: Int?
     
     var body: some View {
-        VStack(spacing: 0) {
-            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                SearchItemRow(
-                    item: item,
-                    isSelected: index == selectedIndex
-                )
-                
-                if item.id != items.last?.id {
-                    Divider()
-                        .padding(.leading, 36)
+        ScrollViewReader { proxy in
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(spacing: 0) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        SearchItemRow(
+                            item: item,
+                            isSelected: index == selectedIndex
+                        )
+                        .id(index) // Adiciona um ID para referência do scroll
+                        
+                        if item.id != items.last?.id {
+                            Divider()
+                                .padding(.leading, 36)
+                        }
+                    }
+                }
+            }
+            .onChange(of: selectedIndex) { oldValue, newValue in
+                if let index = newValue {
+                    withAnimation {
+                        proxy.scrollTo(index, anchor: .center)
+                    }
                 }
             }
         }
+        .frame(minHeight: 100, maxHeight: 500)
         .background(.ultraThinMaterial)
         .cornerRadius(8)
     }
