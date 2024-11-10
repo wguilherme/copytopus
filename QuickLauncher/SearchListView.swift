@@ -13,8 +13,7 @@ struct SearchListView: View {
                             item: item,
                             isSelected: index == selectedIndex
                         )
-                        .id(index) // Adiciona um ID para referência do scroll
-                        
+                        .id(index)                         
                         if item.id != items.last?.id {
                             Divider()
                                 .padding(.leading, 36)
@@ -30,7 +29,7 @@ struct SearchListView: View {
                 }
             }
         }
-        .frame(minHeight: 100, maxHeight: 500)
+        .frame(minHeight: 500, maxHeight: 700)
         .background(.ultraThinMaterial)
         .cornerRadius(8)
     }
