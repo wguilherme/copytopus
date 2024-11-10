@@ -73,6 +73,12 @@ class ClipboardManager: ObservableObject {
             clipboardHistory = decoded
         }
     }
+
+    func deleteItem(at index: Int) {
+        guard index >= 0 && index < clipboardHistory.count else { return }
+        clipboardHistory.remove(at: index)
+        saveHistory()
+    }
     
     func clearHistory() {
         clipboardHistory.removeAll()

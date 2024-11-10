@@ -158,6 +158,27 @@ struct SearchView: View {
                     }
                     return .handled
                 }
+                .onKeyPress { press in
+                    if press.key == .delete || press.key == .deleteForward {
+                        print("delete pressed")
+                        if let selectedIndex = selectedIndex {
+                            if let realIndex = clipboardManager.clipboardHistory.firstIndex(where: { item in
+                                filteredItems[selectedIndex].id == item.id
+                            }) {
+                                clipboardManager.deleteItem(at: realIndex)
+                                
+                                // Ajusta o selectedIndex após a deleção
+                                if filteredItems.isEmpty {
+                                    self.selectedIndex = nil
+                                } else {
+                                    self.selectedIndex = min(selectedIndex, filteredItems.count - 1)
+                                }
+                            }
+                        }
+                        return .handled
+                    }
+                    return .ignored
+                }
                 .onSubmit {
                     handleEnter()
                 }
