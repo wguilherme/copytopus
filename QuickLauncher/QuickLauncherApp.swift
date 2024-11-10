@@ -132,7 +132,7 @@ struct SearchView: View {
                     searchText = ""
                     selectedIndex = nil  // Resetar seleção
                 }
-                .onChange(of: appDelegate.isWindowOpen) { newValue in
+                .onChange(of: appDelegate.isWindowOpen) { oldValue, newValue in
                     if newValue {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             isFocused = true
@@ -142,7 +142,7 @@ struct SearchView: View {
                         selectedIndex = nil  // Resetar seleção
                     }
                 }
-                .onKeyPress(.upArrow) { 
+                .onKeyPress(.upArrow) {
                     if let current = selectedIndex {
                         selectedIndex = max(0, current - 1)
                     } else if !filteredItems.isEmpty {

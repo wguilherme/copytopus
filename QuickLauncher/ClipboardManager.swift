@@ -76,8 +76,10 @@ class ClipboardManager: ObservableObject {
 
     func deleteItem(at index: Int) {
         guard index >= 0 && index < clipboardHistory.count else { return }
-        clipboardHistory.remove(at: index)
-        saveHistory()
+        DispatchQueue.main.async {
+            self.clipboardHistory.remove(at: index)
+            self.saveHistory()
+        }
     }
     
     func clearHistory() {
