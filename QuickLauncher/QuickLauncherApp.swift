@@ -15,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var hotKey: HotKey?
     private var popover: NSWindow?
     @Published var isWindowOpen = false
+    private var windowDelegate: WindowDelegate?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
@@ -43,10 +44,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         
         popover = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 44),
-            styleMask: [.borderless, .titled],  // Adicionado .titled para permitir foco
+            styleMask: [.borderless, .titled],
             backing: .buffered,
             defer: false
         )
+        
+        windowDelegate = WindowDelegate(appDelegate: self)
+        popover?.delegate = windowDelegate
         
         popover?.contentView = hostingView
         popover?.backgroundColor = .clear
@@ -59,26 +63,45 @@ class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     
     private func togglePopover() {
         if popover?.isVisible == true {
-            popover?.orderOut(nil)
-            isWindowOpen = false
+            closePopover()
         } else {
-            guard let screen = NSScreen.main else { return }
-            let screenRect = screen.frame
-            let popoverRect = popover?.frame ?? .zero
-            
-            let x = (screenRect.width - popoverRect.width) / 2
-            let y = (screenRect.height - popoverRect.height) / 2
-            
-            popover?.setFrameOrigin(NSPoint(x: x, y: y))
-            popover?.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            isWindowOpen = true
-            
-            // Força o foco após um pequeno delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                NSApp.activate(ignoringOtherApps: true)
-            }
+            openPopover()
         }
+    }
+    
+    func closePopover() {
+        popover?.orderOut(nil)
+        isWindowOpen = false
+    }
+    
+    private func openPopover() {
+        guard let screen = NSScreen.main else { return }
+        let screenRect = screen.frame
+        let popoverRect = popover?.frame ?? .zero
+        
+        let x = (screenRect.width - popoverRect.width) / 2
+        let y = (screenRect.height - popoverRect.height) / 2
+        
+        popover?.setFrameOrigin(NSPoint(x: x, y: y))
+        popover?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        isWindowOpen = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+}
+
+class WindowDelegate: NSObject, NSWindowDelegate {
+    weak var appDelegate: AppDelegate?
+    
+    init(appDelegate: AppDelegate) {
+        self.appDelegate = appDelegate
+    }
+    
+    func windowDidResignKey(_ notification: Notification) {
+        appDelegate?.closePopover()
     }
 }
 
@@ -93,12 +116,15 @@ struct SearchView: View {
             .focused($isFocused)
             .onAppear {
                 isFocused = true
+                searchText = ""  // Reset do texto ao abrir
             }
             .onChange(of: appDelegate.isWindowOpen) { newValue in
                 if newValue {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         isFocused = true
                     }
+                } else {
+                    searchText = ""  // Reset do texto ao fechar
                 }
             }
             .padding(10)
