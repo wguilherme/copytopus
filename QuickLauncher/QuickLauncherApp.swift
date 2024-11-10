@@ -110,38 +110,57 @@ struct SearchView: View {
     @FocusState private var isFocused: Bool
     @ObservedObject var appDelegate: AppDelegate
     
+    private var filteredItems: [SearchItem] {
+        if searchText.isEmpty {
+            return []
+        }
+        return SearchItem.mockItems.filter {
+            $0.title.localizedCaseInsensitiveContains(searchText) ||
+            $0.subtitle.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+    
     var body: some View {
-        TextField("Digite algo...", text: $searchText)
-            .textFieldStyle(.plain)
-            .focused($isFocused)
-            .onAppear {
-                isFocused = true
-                searchText = ""  // Reset do texto ao abrir
-            }
-            .onChange(of: appDelegate.isWindowOpen) { newValue in
-                if newValue {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        isFocused = true
-                    }
-                } else {
-                    searchText = ""  // Reset do texto ao fechar
+        VStack(spacing: 0) {
+            TextField("Pesquise...", text: $searchText)
+                .textFieldStyle(.plain)
+                .focused($isFocused)
+                .onAppear {
+                    isFocused = true
+                    searchText = ""
                 }
-            }
-            .padding(10)
-            .background(.ultraThinMaterial)
-            .cornerRadius(8)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .gesture(
-                DragGesture()
-                    .onChanged { gesture in
-                        if let window = NSApplication.shared.windows.first(where: { $0.isKeyWindow }) {
-                            let newPosition = CGPoint(
-                                x: window.frame.origin.x + gesture.translation.width,
-                                y: window.frame.origin.y - gesture.translation.height
-                            )
-                            window.setFrameOrigin(newPosition)
+                .onChange(of: appDelegate.isWindowOpen) { newValue in
+                    if newValue {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isFocused = true
                         }
+                    } else {
+                        searchText = ""
                     }
-            )
+                }
+                .padding(10)
+                .background(.ultraThinMaterial)
+                .cornerRadius(8)
+            
+            // Search Results List
+            if !filteredItems.isEmpty {
+                SearchListView(items: filteredItems)
+                    .padding(.top, 4)
+            }
+        }
+        .padding(10)
+        .frame(width: 400)
+        .gesture(
+            DragGesture()
+                .onChanged { gesture in
+                    if let window = NSApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+                        let newPosition = CGPoint(
+                            x: window.frame.origin.x + gesture.translation.width,
+                            y: window.frame.origin.y - gesture.translation.height
+                        )
+                        window.setFrameOrigin(newPosition)
+                    }
+                }
+        )
     }
 }
