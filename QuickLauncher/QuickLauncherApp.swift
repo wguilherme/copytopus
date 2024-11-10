@@ -122,7 +122,7 @@ struct SearchView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            TextField("Pesquise...", text: $searchText)
+            TextField("Digite algo...", text: $searchText)
                 .textFieldStyle(.plain)
                 .focused($isFocused)
                 .onAppear {
